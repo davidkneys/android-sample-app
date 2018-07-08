@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Note App</string>
+
+    <string name="enter_note_hint">Enter your note</string>
+    <string name="by_david_kneys">by David Kneys</string>
+
+    <string name="czech">Czech</string>
+    <string name="english">English</string>
+
+    <string name="not_empty_title_warning">Title cannot be empty!</string>
+
+    <string name="update_note_title">Update Note</string>
+    <string name="update_note_content">Here would come detail of the note such as description or pictures, etc. Current api returns only id and title again, but in real life that wouldn't be the case.</string>
+    <string name="update_note_delete">Remove</string>
+    <string name="update_note_update">Update</string>
+
+    <string name="syncing">Syncing...</string>
+
+    <string name="check_internet">Check your internet connection</string>
+    <string name="check_internet_refresh">Refresh</string>
+</resources>

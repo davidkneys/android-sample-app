@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Poznámky</string>
+
+    <string name="enter_note_hint">Zadej poznámku</string>
+    <string name="by_david_kneys">od Davida Kneyse</string>
+
+    <string name="czech">Česky</string>
+    <string name="english">Anglicky</string>
+
+    <string name="not_empty_title_warning">Poznámka nemůže být prázdná!</string>
+
+    <string name="update_note_title">Upravit poznámku</string>
+    <string name="update_note_content">Tady by byly data poznámky, její popisek, případně fotky, atd. Stávající API vrací znovu jen ID a popisek poznámky, v reálné aplikaci by to však bylo jinak.</string>
+    <string name="update_note_delete">Smazat</string>
+    <string name="update_note_update">Upravit</string>
+
+    <string name="syncing">Synchronizace...</string>
+
+    <string name="check_internet">Zkontrolujte své internetové připojení</string>
+    <string name="check_internet_refresh">Obnovit</string>
+</resources>
