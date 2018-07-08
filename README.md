@@ -26,4 +26,4 @@ The current code contains 3 basic Unit tests showing how to unit test ViewModels
 * have near to 100% test code coverage
 
 ## Installation
-The application is built with Gradle build system with the stable version of Android Studio 3.1.3. To install one just needs to fork the repository, let the gradle do the rest and install the App to a device or Emulator with SDK >=19. Current implementation contains only Unit tests without Android dependencies.
+The application is built with Gradle build system with the stable version of Android Studio 3.1.3. To install one just needs to clone the repository, let the gradle do the rest and install the App to a device or Emulator with SDK >=19. Current implementation contains only Unit tests without Android dependencies.
