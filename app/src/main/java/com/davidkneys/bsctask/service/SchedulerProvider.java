@@ -6,5 +6,5 @@ import io.reactivex.Scheduler;
  * Helper provider of RxJava schedulers.
  */
 public interface SchedulerProvider {
-    Scheduler getAndroidMainThreadScheduler();
+    Scheduler ui();
 }

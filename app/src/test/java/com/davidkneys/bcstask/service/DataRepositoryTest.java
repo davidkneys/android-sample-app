@@ -5,7 +5,7 @@ import com.davidkneys.bsctask.api.PutNoteRequest;
 import com.davidkneys.bsctask.di.NetworkModule;
 import com.davidkneys.bsctask.service.DataRepository;
 import com.davidkneys.bsctask.service.OnlineChecker;
-import com.davidkneys.bsctask.ui.detail.NoteDetailVM;
+import com.davidkneys.bsctask.ui.NoteUI;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,14 +71,14 @@ public class DataRepositoryTest {
 
         DataRepository dataRepository = new DataRepository(bscApiTest, onlineChecker);
 
-        TestObserver<List<NoteDetailVM.NoteUI>> testObserver = dataRepository.notes().test();
+        TestObserver<List<NoteUI>> testObserver = dataRepository.notes().test();
         testObserver.awaitCount(1);
         testObserver.assertNoValues();
 
         //fetch should be initiated every time when App comes back to online state
         onlineChecker.setOnline(true);
         testObserver.awaitCount(1);
-        List<List<NoteDetailVM.NoteUI>> values = testObserver.values();
+        List<List<NoteUI>> values = testObserver.values();
         Assert.assertTrue(values.size() == 1);
 
         //fetch should be initiated every time when App comes back to online state
@@ -99,7 +99,7 @@ public class DataRepositoryTest {
 
         DataRepository dataRepository = new DataRepository(bscApiTest, testOnlineChecker);
 
-        TestObserver<List<NoteDetailVM.NoteUI>> testObserver = dataRepository.notes().test();
+        TestObserver<List<NoteUI>> testObserver = dataRepository.notes().test();
 
         // wait for first initiation by online checker
         testObserver.awaitCount(1);
@@ -111,25 +111,25 @@ public class DataRepositoryTest {
         // - third coming from BscAPI
         testObserver.awaitCount(3);
 
-        testObserver.assertValueAt(0, new Predicate<List<NoteDetailVM.NoteUI>>() {
+        testObserver.assertValueAt(0, new Predicate<List<NoteUI>>() {
             @Override
-            public boolean test(List<NoteDetailVM.NoteUI> noteUIS) throws Exception {
+            public boolean test(List<NoteUI> noteUIS) throws Exception {
                 return noteUIS.size() == startingDataSize;
             }
         });
 
-        testObserver.assertValueAt(1, new Predicate<List<NoteDetailVM.NoteUI>>() {
+        testObserver.assertValueAt(1, new Predicate<List<NoteUI>>() {
             @Override
-            public boolean test(List<NoteDetailVM.NoteUI> noteUIS) throws Exception {
-                NoteDetailVM.NoteUI note = noteUIS.get(0);
+            public boolean test(List<NoteUI> noteUIS) throws Exception {
+                NoteUI note = noteUIS.get(0);
                 return note.isDirty() && note.getNote().getTitle().equals(TEST_NOTE_TITLE);
             }
         });
 
-        testObserver.assertValueAt(2, new Predicate<List<NoteDetailVM.NoteUI>>() {
+        testObserver.assertValueAt(2, new Predicate<List<NoteUI>>() {
             @Override
-            public boolean test(List<NoteDetailVM.NoteUI> noteUIS) throws Exception {
-                NoteDetailVM.NoteUI note = noteUIS.get(0);
+            public boolean test(List<NoteUI> noteUIS) throws Exception {
+                NoteUI note = noteUIS.get(0);
                 return !note.isDirty() && note.getNote().getTitle().equals(TEST_NOTE_TITLE);
             }
         });

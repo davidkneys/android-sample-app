@@ -11,7 +11,7 @@ public class SchedulerProviderImpl implements SchedulerProvider {
     }
 
     @Override
-    public Scheduler getAndroidMainThreadScheduler() {
+    public Scheduler ui() {
         return androidMainThreadScheduler;
     }
 }

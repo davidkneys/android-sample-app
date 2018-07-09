@@ -6,6 +6,7 @@ import com.davidkneys.bsctask.api.Note;
 import com.davidkneys.bsctask.service.DataRepository;
 import com.davidkneys.bsctask.service.OnlineChecker;
 import com.davidkneys.bsctask.service.SchedulerProvider;
+import com.davidkneys.bsctask.ui.NoteUI;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,11 +23,11 @@ public class NoteDetailVM extends ViewModel {
 
     private Logger logger = Logger.getLogger(NoteDetailVM.class.getName());
 
-    private Disposable fetchingNote = Disposables.empty();
     private DataRepository repository;
     private OnlineChecker onlineChecker;
     private SchedulerProvider schedulerProvider;
 
+    private Disposable fetchingNote = Disposables.empty();
     private Disposable checkerDisposable = Disposables.empty();
 
     private BehaviorSubject<NoteUI> selectedNote = BehaviorSubject.create();
@@ -38,8 +39,10 @@ public class NoteDetailVM extends ViewModel {
         this.schedulerProvider = schedulerProvider;
     }
 
-    public Observable<NoteUI> observeSelectedNote() {
-        return selectedNote.observeOn(schedulerProvider.getAndroidMainThreadScheduler());
+    public Observable<NoteDetailViewState> observeViewState() {
+        return selectedNote
+                .map(noteUI -> new NoteDetailViewState(noteUI.getNote().getTitle(), noteUI.isDirty()))
+                .observeOn(schedulerProvider.ui());
     }
 
     public void fetchNote(Note note) {
@@ -49,7 +52,7 @@ public class NoteDetailVM extends ViewModel {
                 .flatMap(data -> Single.just(new NoteUI(false, data)))
                 .toObservable()
                 .startWith(new NoteUI(true, note))
-                .observeOn(schedulerProvider.getAndroidMainThreadScheduler())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(data -> {
                     selectedNote.onNext(data);
                 }, throwable -> {
@@ -67,11 +70,11 @@ public class NoteDetailVM extends ViewModel {
     }
 
     public void delete() {
-        repository.removeNote(selectedNote.getValue().note);
+        repository.removeNote(selectedNote.getValue().getNote());
     }
 
     public void update(String newTitle) {
-        repository.updateNote(selectedNote.getValue().note, newTitle);
+        repository.updateNote(selectedNote.getValue().getNote(), newTitle);
     }
 
     @Override
@@ -81,21 +84,4 @@ public class NoteDetailVM extends ViewModel {
         super.onCleared();
     }
 
-    public static final class NoteUI {
-        private final boolean dirty;
-        private final Note note;
-
-        public NoteUI(boolean dirty, Note note) {
-            this.dirty = dirty;
-            this.note = note;
-        }
-
-        public boolean isDirty() {
-            return dirty;
-        }
-
-        public Note getNote() {
-            return note;
-        }
-    }
 }

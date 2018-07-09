@@ -43,7 +43,7 @@ public class NoteDetailVMTest {
         vm = new NoteDetailVM(dataRepositoryMock, testOnlineChecker, Schedulers::single);
         vm.selectNote(TEST_NOTE);
         // wait until note is selected
-        vm.observeSelectedNote().test().awaitCount(1);
+        vm.observeViewState().test().awaitCount(1);
 
         //--------------------------------
         vm.update(TEST_NEW_TITLE);

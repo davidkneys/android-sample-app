@@ -15,21 +15,32 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.davidkneys.bsctask.R;
-import com.davidkneys.bsctask.ui.detail.NoteDetailVM;
+import com.davidkneys.bsctask.ui.NoteUI;
 import com.davidkneys.bsctask.utils.BaseFragment;
 import com.davidkneys.bsctask.utils.LocaleManager;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * UI representing list of all Notes.
  */
 public class NotesFragment extends BaseFragment implements NotesAdapter.Listener {
 
-    private Toolbar toolbar;
-    private View btnAddNote;
-    private EditText editNote;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView notesList;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
+    @BindView(R.id.btnAddNote)
+    View btnAddNote;
+    @BindView(R.id.editNote)
+    EditText editNote;
+    @BindView(R.id.swipeToRefresh)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    @BindView(R.id.notesList)
+    RecyclerView notesList;
+
+    private NotesAdapter notesAdapter;
     private NotesVM vm;
 
     @Nullable
@@ -42,16 +53,13 @@ public class NotesFragment extends BaseFragment implements NotesAdapter.Listener
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        toolbar = getView().findViewById(R.id.toolbar);
-        btnAddNote = getView().findViewById(R.id.btnAddNote);
-        editNote = getView().findViewById(R.id.editNote);
-        swipeRefreshLayout = getView().findViewById(R.id.swipeToRefresh);
-        notesList = getView().findViewById(R.id.notesList);
+        ButterKnife.bind(this, getView());
 
         vm = ViewModelProviders.of(this, factory()).get(NotesVM.class);
 
         notesList.setLayoutManager(new LinearLayoutManager(getContext()));
+        notesAdapter = new NotesAdapter(getContext(), this);
+        notesList.setAdapter(notesAdapter);
         setupToolbarMenu();
 
         btnAddNote.setOnClickListener(v -> {
@@ -67,10 +75,10 @@ public class NotesFragment extends BaseFragment implements NotesAdapter.Listener
         });
 
         subscribe(vm
-                .observeNotesListViewData()
+                .observeViewState()
                 .subscribe(notesData -> {
                     swipeRefreshLayout.setRefreshing(notesData.isRefreshing());
-                    notesList.setAdapter(new NotesAdapter(getContext(), notesData.getData(), this));
+                    notesAdapter.loadWithData(notesData.getData());
                 }));
     }
 
@@ -93,14 +101,14 @@ public class NotesFragment extends BaseFragment implements NotesAdapter.Listener
     }
 
     @Override
-    public void onNoteClick(NoteDetailVM.NoteUI note) {
+    public void onNoteClick(NoteUI note) {
         if (!note.isDirty()) {
             commonState().select(note.getNote());
         }
     }
 
     @Override
-    public void onNoteDelete(NoteDetailVM.NoteUI delete) {
+    public void onNoteDelete(NoteUI delete) {
         // todo we do not support delete from list itself yet
     }
 }

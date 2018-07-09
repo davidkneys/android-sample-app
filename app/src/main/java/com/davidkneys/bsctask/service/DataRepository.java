@@ -3,7 +3,7 @@ package com.davidkneys.bsctask.service;
 import com.davidkneys.bsctask.api.BscApi;
 import com.davidkneys.bsctask.api.Note;
 import com.davidkneys.bsctask.api.PutNoteRequest;
-import com.davidkneys.bsctask.ui.detail.NoteDetailVM;
+import com.davidkneys.bsctask.ui.NoteUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class DataRepository {
     private BscApi api;
     private OnlineChecker onlineChecker;
 
-    private BehaviorSubject<List<NoteDetailVM.NoteUI>> notes = BehaviorSubject.create();
+    private BehaviorSubject<List<NoteUI>> notes = BehaviorSubject.create();
 
     @Inject
     public DataRepository(BscApi api, OnlineChecker onlineChecker) {
@@ -55,7 +55,7 @@ public class DataRepository {
     /**
      * Stream of fresh notes data. Subscribing to this Observable guarantees having the newest data possible.
      */
-    public Observable<List<NoteDetailVM.NoteUI>> notes() {
+    public Observable<List<NoteUI>> notes() {
         return notes;
     }
 
@@ -66,19 +66,19 @@ public class DataRepository {
                 .subscribe(new DataObserver(notes, onlineChecker, logger));
     }
 
-    private Single<List<NoteDetailVM.NoteUI>> refreshObs() {
+    private Single<List<NoteUI>> refreshObs() {
         return api
                 .getNotes()
                 .toObservable()
                 .flatMap(Observable::fromIterable)
-                .map(note -> new NoteDetailVM.NoteUI(false, note))
+                .map(note -> new NoteUI(false, note))
                 .toSortedList((o1, o2) -> o2.getNote().getId() - o1.getNote().getId());
     }
 
     public void createNote(String title) {
-        final NoteDetailVM.NoteUI pending = new NoteDetailVM.NoteUI(true, new Note((notes.hasValue() ? notes.getValue().size() : 0) + 1000, title));
+        final NoteUI pending = new NoteUI(true, new Note((notes.hasValue() ? notes.getValue().size() : 0) + 1000, title));
 
-        List<NoteDetailVM.NoteUI> dirty;
+        List<NoteUI> dirty;
         if (notes.hasValue()) {
             dirty = new ArrayList<>(notes.getValue());
         } else {
@@ -97,11 +97,11 @@ public class DataRepository {
 
 
     public void removeNote(Note note) {
-        List<NoteDetailVM.NoteUI> dirtyNotes = Observable
+        List<NoteUI> dirtyNotes = Observable
                 .fromIterable(notes.getValue())
                 .map(noteUI -> {
                     if (noteUI.getNote().getId() == note.getId()) {
-                        return new NoteDetailVM.NoteUI(true, noteUI.getNote());
+                        return new NoteUI(true, noteUI.getNote());
                     } else {
                         return noteUI;
                     }
@@ -117,11 +117,11 @@ public class DataRepository {
     }
 
     public void updateNote(Note note, String newTitle) {
-        List<NoteDetailVM.NoteUI> dirtyNotes = Observable
+        List<NoteUI> dirtyNotes = Observable
                 .fromIterable(notes.getValue())
                 .map(noteUI -> {
                     if (noteUI.getNote().getId() == note.getId()) {
-                        return new NoteDetailVM.NoteUI(true, new Note(noteUI.getNote().getId(), newTitle));
+                        return new NoteUI(true, new Note(noteUI.getNote().getId(), newTitle));
                     } else {
                         return noteUI;
                     }
@@ -142,13 +142,13 @@ public class DataRepository {
                 .subscribeOn(Schedulers.io());
     }
 
-    private static class DataObserver implements Observer<List<NoteDetailVM.NoteUI>> {
+    private static class DataObserver implements Observer<List<NoteUI>> {
 
-        private BehaviorSubject<List<NoteDetailVM.NoteUI>> source;
+        private BehaviorSubject<List<NoteUI>> source;
         private OnlineChecker onlineChecker;
         private Logger logger;
 
-        public DataObserver(BehaviorSubject<List<NoteDetailVM.NoteUI>> source, OnlineChecker onlineChecker, Logger logger) {
+        public DataObserver(BehaviorSubject<List<NoteUI>> source, OnlineChecker onlineChecker, Logger logger) {
             this.source = source;
             this.onlineChecker = onlineChecker;
             this.logger = logger;
@@ -160,7 +160,7 @@ public class DataRepository {
         }
 
         @Override
-        public void onNext(List<NoteDetailVM.NoteUI> noteUIS) {
+        public void onNext(List<NoteUI> noteUIS) {
             source.onNext(noteUIS);
         }
 

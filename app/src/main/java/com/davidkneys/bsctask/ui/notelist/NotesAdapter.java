@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.davidkneys.bsctask.R;
-import com.davidkneys.bsctask.ui.detail.NoteDetailVM;
+import com.davidkneys.bsctask.ui.NoteUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +23,24 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteVH> {
     private final Context context;
     private final Listener listener;
 
-    private final List<NoteDetailVM.NoteUI> data = new ArrayList<>();
+    private final List<NoteUI> data = new ArrayList<>();
 
     public NotesAdapter(Context context,
-                        List<NoteDetailVM.NoteUI> data,
                         Listener listener) {
         this.context = context.getApplicationContext();
-        this.data.addAll(data);
         this.listener = listener;
+        setHasStableIds(true);
+    }
+
+    public void loadWithData(List<NoteUI> newData) {
+        this.data.clear();
+        this.data.addAll(newData);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return data.get(position).getNote().getId();
     }
 
     @Override
@@ -65,12 +75,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteVH> {
             this.resources = itemView.getResources();
         }
 
-        public void bind(NoteDetailVM.NoteUI item) {
+        public void bind(NoteUI item) {
             textTitle.setText(item.getNote().getTitle());
             if (item.isDirty()) {
                 itemView.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.pendingNote, null));
                 textId.setText(resources.getString(R.string.syncing));
             } else {
+                itemView.setBackgroundColor(0);
                 textId.setText(String.format("Id: %d", item.getNote().getId()));
             }
 
@@ -81,8 +92,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteVH> {
     }
 
     interface Listener {
-        void onNoteClick(NoteDetailVM.NoteUI note);
+        void onNoteClick(NoteUI note);
 
-        void onNoteDelete(NoteDetailVM.NoteUI delete);
+        void onNoteDelete(NoteUI delete);
     }
 }

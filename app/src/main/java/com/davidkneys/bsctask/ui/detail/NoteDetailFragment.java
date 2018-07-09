@@ -14,19 +14,28 @@ import android.widget.EditText;
 import com.davidkneys.bsctask.R;
 import com.davidkneys.bsctask.utils.BaseFragment;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * UI representing detail of one Note.
  */
 public class NoteDetailFragment extends BaseFragment {
 
-    private Toolbar toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
-    private EditText editTitle;
-    private View loadingData;
-    private View loadedContent;
+    @BindView(R.id.editTitle)
+    EditText editTitle;
+    @BindView(R.id.loadingData)
+    View loadingData;
+    @BindView(R.id.loadedContent)
+    View loadedContent;
 
-    private Button btnRemove;
-    private Button btnUpdate;
+    @BindView(R.id.btnRemove)
+    Button btnRemove;
+    @BindView(R.id.btnUpdate)
+    Button btnUpdate;
 
     private NoteDetailVM vm;
 
@@ -40,14 +49,7 @@ public class NoteDetailFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        toolbar = getView().findViewById(R.id.toolbar);
-        editTitle = getView().findViewById(R.id.editTitle);
-        loadingData = getView().findViewById(R.id.loadingData);
-        loadedContent = getView().findViewById(R.id.loadedContent);
-
-        btnRemove = getView().findViewById(R.id.btnRemove);
-        btnUpdate = getView().findViewById(R.id.btnUpdate);
+        ButterKnife.bind(this, getView());
 
         vm = ViewModelProviders.of(this, factory()).get(NoteDetailVM.class);
 
@@ -69,11 +71,11 @@ public class NoteDetailFragment extends BaseFragment {
                         vm.selectNote(note)
                 ));
 
-        subscribe(vm.observeSelectedNote().subscribe(note -> {
-            editTitle.setText(note.getNote().getTitle());
+        subscribe(vm.observeViewState().subscribe(viewState -> {
+            editTitle.setText(viewState.getTitle());
 
-            loadingData.setVisibility(note.isDirty() ? View.VISIBLE : View.GONE);
-            loadedContent.setVisibility(note.isDirty() ? View.GONE : View.VISIBLE);
+            loadingData.setVisibility(viewState.isLoading() ? View.VISIBLE : View.GONE);
+            loadedContent.setVisibility(viewState.isLoading() ? View.GONE : View.VISIBLE);
         }));
     }
 }
